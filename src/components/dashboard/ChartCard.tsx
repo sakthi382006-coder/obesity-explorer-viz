@@ -10,14 +10,14 @@ interface ChartCardProps {
 
 export const ChartCard = ({ title, description, children, className = "" }: ChartCardProps) => {
   return (
-    <Card className={`shadow-card hover:shadow-elevated transition-shadow ${className}`}>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+    <Card className={`glass-card hover-lift shadow-glass animate-fade-in ${className}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-semibold tracking-tight">{title}</CardTitle>
         {description && (
-          <CardDescription className="text-sm">{description}</CardDescription>
+          <CardDescription className="text-sm text-muted-foreground">{description}</CardDescription>
         )}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent className="pt-0">{children}</CardContent>
     </Card>
   );
 };

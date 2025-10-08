@@ -1,8 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { FilterState } from "@/types/obesity";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 
 interface FilterPanelProps {
   filters: FilterState;
@@ -10,21 +10,34 @@ interface FilterPanelProps {
 }
 
 export const FilterPanel = ({ filters, onFilterChange }: FilterPanelProps) => {
-  const handleCheckboxChange = (
+  const handleBadgeClick = (
     category: keyof FilterState,
-    value: string,
-    checked: boolean
+    value: string
   ) => {
     const currentValues = filters[category];
-    const newValues = checked
-      ? [...currentValues, value]
-      : currentValues.filter((v) => v !== value);
+    const isSelected = currentValues.includes(value);
+    const newValues = isSelected
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
     
     onFilterChange({
       ...filters,
       [category]: newValues,
     });
   };
+
+  const handleReset = () => {
+    onFilterChange({
+      gender: [],
+      ageBand: [],
+      familyHistory: [],
+      favc: [],
+      faf: [],
+      calc: [],
+    });
+  };
+
+  const hasActiveFilters = Object.values(filters).some((f) => f.length > 0);
 
   const FilterSection = ({
     title,
@@ -36,36 +49,49 @@ export const FilterPanel = ({ filters, onFilterChange }: FilterPanelProps) => {
     options: string[];
   }) => (
     <div className="space-y-3">
-      <h3 className="font-semibold text-sm text-foreground">{title}</h3>
-      <div className="space-y-2">
-        {options.map((option) => (
-          <div key={option} className="flex items-center space-x-2">
-            <Checkbox
-              id={`${category}-${option}`}
-              checked={filters[category].includes(option)}
-              onCheckedChange={(checked) =>
-                handleCheckboxChange(category, option, checked as boolean)
-              }
-            />
-            <Label
-              htmlFor={`${category}-${option}`}
-              className="text-sm cursor-pointer"
+      <h3 className="font-semibold text-sm text-foreground/80 uppercase tracking-wider">{title}</h3>
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => {
+          const isSelected = filters[category].includes(option);
+          return (
+            <Badge
+              key={option}
+              variant={isSelected ? "default" : "outline"}
+              className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
+                isSelected 
+                  ? "bg-primary text-primary-foreground shadow-md" 
+                  : "hover:bg-primary/10 hover:border-primary/50"
+              }`}
+              onClick={() => handleBadgeClick(category, option)}
             >
               {option}
-            </Label>
-          </div>
-        ))}
+            </Badge>
+          );
+        })}
       </div>
     </div>
   );
 
   return (
-    <Card className="shadow-card">
+    <Card className="glass-card shadow-glass sticky top-8">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          Filters
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Filter className="h-5 w-5 text-primary" />
+            Filters
+          </CardTitle>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              className="h-8 px-2 hover:bg-destructive/10 hover:text-destructive"
+            >
+              <X className="h-4 w-4 mr-1" />
+              Reset
+            </Button>
+          )}
+        </div>
         <CardDescription>Refine your analysis</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
